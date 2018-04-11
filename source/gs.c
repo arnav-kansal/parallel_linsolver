@@ -157,7 +157,7 @@ void solve(){
   float currerr = FLT_MIN;
   do{
   // update x values
-
+    currerr = FLT_MIN;
     // MPI DISTRIBUTE
     for(int i=0; i<num; ++i){
       
@@ -180,8 +180,8 @@ void solve(){
 
     //#pragma omp parallel for reduction(max : currerr)
     for(int i=0; i<num; ++i){
-      float new_err = 100.0*(x_new[i]-x_old[i])/x_old[i];
-      if(currerr > new_err){
+      float new_err = (x_new[i]-x_old[i])/x_new[i];
+      if(currerr < new_err){
         currerr = new_err;
       }
     }
@@ -205,7 +205,7 @@ int main(int argc, char *argv[])
   
  if( argc != 2)
  {
-   printf("Usage: ./gsref filename\n");
+   printf("Usage: ./gs filename\n");
    exit(1);
  }
   
