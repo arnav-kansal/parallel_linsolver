@@ -3,7 +3,7 @@
 #include <float.h>
 #include <math.h>
 #include <string.h>
-
+#include <omp.h>
 #define DEBUG 1
 /*** Skeleton for Lab 1 ***/
 

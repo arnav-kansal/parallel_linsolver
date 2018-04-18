@@ -1,6 +1,6 @@
-CC		= mpicc
+CC		= gcc
 
-CFLAGS		= -std=c99
+CFLAGS		= -fopenmp -std=c99
 
 CLIBS		= -lm 
 
