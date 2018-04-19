@@ -229,8 +229,15 @@ int main(int argc, char *argv[])
 
   float* x_new;
   float* x_curr;  
-  x_new = calloc(num, sizeof(float));
-  x_curr = calloc(num, sizeof(float));
+  int allocs;
+  if(num%comm_size == 0){
+    allocs = num;
+  }
+  else{
+    allocs = (num + (comm_size-(num%comm_size)));
+  }
+  x_new = calloc(allocs, sizeof(float));
+  x_curr = calloc(allocs, sizeof(float));
   float err_round;
   do{
     NUM_ITER++;
@@ -260,21 +267,24 @@ int main(int argc, char *argv[])
   free(x_new);
   free(x_curr);
 
-  MPI_Finalize();
+  //MPI_Finalize();
 
   /* Writing results to file */
-  sprintf(output,"%d.sol",num);
-  fp = fopen(output,"w");
-  if(!fp){
-    printf("Cannot create the file %s\n", output);
-    exit(1);
-  }
+  if(my_rank == 0){
+    sprintf(output,"%d.sol",num);
+    fp = fopen(output,"w");
+    if(!fp){
+      printf("Cannot create the file %s\n", output);
+      exit(1);
+    }
     
-  for( i = 0; i < num; i++)
-    fprintf(fp,"%f\n",x[i]);
+    for( i = 0; i < num; i++)
+      fprintf(fp,"%f\n",x[i]);
  
-  printf("total number of iterations: %d\n", NUM_ITER);
+    printf("total number of iterations: %d\n", NUM_ITER);
  
-  fclose(fp);
+    fclose(fp);
+  }
+  MPI_Finalize();
   exit(0);
 }
