@@ -212,11 +212,12 @@ int main(int argc, char *argv[])
  //solve();
   int comm_size;      // Number of processes
   int my_rank;        // My process rank
-
+ 
   MPI_Init(NULL, NULL);
   MPI_Comm_size(MPI_COMM_WORLD, &comm_size);
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-
+  if(my_rank == 0)
+      printf("%d\n",comm_size);
   int bucket_size = (num + comm_size - 1) / (comm_size);
   int imperfect_div = num % comm_size;
 
@@ -227,10 +228,10 @@ int main(int argc, char *argv[])
   }
 
   float* x_new;
-  
+  float* x_curr;  
   x_new = calloc(num, sizeof(float));
   x_curr = calloc(num, sizeof(float));
-  
+  float err_round;
   do{
     NUM_ITER++;
 
@@ -247,11 +248,11 @@ int main(int argc, char *argv[])
     MPI_Allgather(x_curr, bucket_size, MPI_FLOAT, x_new, bucket_size, MPI_FLOAT, MPI_COMM_WORLD);
     MPI_Barrier(MPI_COMM_WORLD);
 
-    int err_round = err-0.1;
+    err_round = err-0.1;
     for (int i = 0; i < num; ++i){
-      float curr_error = fabs((x_new[i] - x[i])/x_new);
-      if (curr_err > err_round)
-        err_round = curr_err;
+      float curr_error = fabs((x_new[i] - x[i])/x_new[i]);
+      if (curr_error > err_round)
+        err_round = curr_error;
       x[i] = x_new[i];
     }
   }while(err_round > err);
